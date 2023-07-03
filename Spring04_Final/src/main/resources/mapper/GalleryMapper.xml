@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gallery">
+
+	<insert id="insert" parameterType="galleryDto">
+		INSERT INTO board_Gallery
+		(num, writer, caption, imagePath, regdate)
+		VALUES(board_Gallery_seq.NEXTVAL, #{writer}, 
+			#{caption}, #{imagePath}, SYSDATE)
+	</insert>
+	<select id="getData" parameterType="int" resultType="galleryDto">
+		SELECT num,writer,caption,imagePath, regdate
+		FROM board_gallery
+		WHERE num=#{num}
+	</select>
+	<delete id="delete" parameterType="int">
+		DELETE FROM board_gallery
+		WHERE num=#{num}
+	</delete>
+	<select id="getList" parameterType="galleryDto" 
+		resultType="galleryDto">
+		SELECT *
+		FROM
+			(SELECT result1.*, ROWNUM AS rnum
+			FROM
+				(SELECT num,writer,caption,imagePath,regdate,
+				FROM board_gallery
+				<choose>
+					<when test="caption != null and imagePath != null">
+						WHERE caption LIKE  '%'||#{caption}||'%' OR imagePath LIKE '%'||#{imagePath}||'%'
+					</when>
+					<when test="caption != null">
+						WHERE caption LIKE '%'||#{caption}||'%'
+					</when>
+					<when test="writer != null">
+						WHERE writer LIKE '%'||#{writer}||'%'
+					</when>
+				</choose>							
+				ORDER BY num DESC) result1)
+		WHERE rnum BETWEEN #{startRowNum} AND #{endRowNum}
+	</select>
+	<select id="getCount" parameterType="galleryDto" resultType="int">
+		SELECT NVL(MAX(ROWNUM), 0)
+		FROM board_gallery
+		<choose>
+			<when test="caption != null and imagePath != null">
+				WHERE caption LIKE  '%'||#{caption}||'%' OR imagePath LIKE '%'||#{imagePath}||'%'
+			</when>
+			<when test="caption != null">
+				WHERE caption LIKE '%'||#{caption}||'%'
+			</when>
+			<when test="writer != null">
+				WHERE writer LIKE '%'||#{writer}||'%'
+			</when>
+		</choose>
+	</select>
+	<update id="update" parameterType="galleryDto">
+		UPDATE board_gallery
+		SET caption=#{caption}, imagePath=#{imagePath}
+		WHERE num=#{num}
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+

@@ -1,12 +1,18 @@
 package com.gura.spring04.cafe.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.gura.spring04.cafe.dto.CafeCommentDto;
 import com.gura.spring04.cafe.dto.CafeDto;
 import com.gura.spring04.cafe.service.CafeService;
 
@@ -15,6 +21,27 @@ public class CafeController {
 	@Autowired
 	private CafeService service;
 	
+	//댓글 수정 요청처리(JSON을 응답하도록 한다.)
+	@RequestMapping("/cafe/comment_update")
+	@ResponseBody
+	public Map<String, Object>commentUpdate(CafeCommentDto dto){
+		service.updateComment(dto);
+		Map<String, Object>map=new HashMap<String, Object>();
+		map.put("isSuccess", true);
+		//{"isSuccess":true}형식의 JSON 문자열이 응답되도록 한다
+		return map;
+	}
+	
+	//댓글 삭제 요청 처리
+	@RequestMapping("/cafe/comment_delete")
+	@ResponseBody
+	public Map<String, Object>commentDelete(HttpServletRequest request){
+		service.deleteComment(request);
+		Map<String, Object>map=new HashMap<String, Object>();
+		map.put("isSuccess", true);
+		//{"isSuccess":true} 형식의 JSON 문자열이 응답되도록한다.
+		return map;
+	}
 	//댓글 더보기 요청 처리
 	@RequestMapping("/cafe/ajax_comment_list")
 	public String commentList(HttpServletRequest request) {
