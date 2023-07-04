@@ -44,6 +44,7 @@
 <body>
 <div class="container">
       <a href="${pageContext.request.contextPath}/gallery/upload_form">사진 업로드 하러 가기</a>
+      <a href="${pageContext.request.contextPath}/gallery/upload_form2">사진 업로드 하러 가기2</a>
       <h1>겔러리 목록 입니다.</h1>
       <div class="row">
       <c:forEach var="tmp" items="${list }">
@@ -74,7 +75,7 @@
          <c:otherwise>
             <li class="page-item disabled">
                      <a class="page-link" href="javascript:">Prev</a>
-               </li>
+            </li>
          </c:otherwise>
       </c:choose>
       <c:forEach var="i" begin="${startPageNum }" end="${endPageNum }">

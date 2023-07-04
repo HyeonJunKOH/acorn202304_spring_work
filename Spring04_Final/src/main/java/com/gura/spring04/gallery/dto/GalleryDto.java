@@ -14,10 +14,25 @@ public class GalleryDto {
 	private int prevNum; //이전글의 글번호
 	private int nextNum; //다음글의 글번호
 	//파일 업로드 처리를 하기 위한 필드
-	private MultipartFile myGallery;
+	private MultipartFile image;
 	
 	//디폴트 생성자
 	public GalleryDto() {}
+
+	public GalleryDto(int num, String writer, String caption, String imagePath, String regdate, int startRowNum,
+			int endRowNum, int prevNum, int nextNum, MultipartFile image) {
+		super();
+		this.num = num;
+		this.writer = writer;
+		this.caption = caption;
+		this.imagePath = imagePath;
+		this.regdate = regdate;
+		this.startRowNum = startRowNum;
+		this.endRowNum = endRowNum;
+		this.prevNum = prevNum;
+		this.nextNum = nextNum;
+		this.image = image;
+	}
 
 	public int getNum() {
 		return num;
@@ -91,14 +106,12 @@ public class GalleryDto {
 		this.nextNum = nextNum;
 	}
 
-	public MultipartFile getMyGallery() {
-		return myGallery;
+	public MultipartFile getImage() {
+		return image;
 	}
 
-	public void setMyGallery(MultipartFile myGallery) {
-		this.myGallery = myGallery;
+	public void setImage(MultipartFile image) {
+		this.image = image;
 	}
 
-	
-	
 }

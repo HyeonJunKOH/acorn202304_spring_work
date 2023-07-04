@@ -1,223 +1,149 @@
 package com.gura.spring04.gallery.service;
 
 
+
+
 import java.io.File;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.gura.spring04.exception.NotDeleteException;
+import org.springframework.web.servlet.ModelAndView;
+
 import com.gura.spring04.gallery.dao.GalleryDao;
 import com.gura.spring04.gallery.dto.GalleryDto;
 
 @Service
 public class GalleryServiceImpl implements GalleryService{
 	@Autowired
-	GalleryDao dao;
+	private GalleryDao dao;
 
 	@Override
 	public void getList(HttpServletRequest request) {
-		//한 페이지에 몇개씩 표시할 것인지
-		final int PAGE_ROW_COUNT=5;
-		//하단 페이지를 몇개씩 표시할 것인지
-		final int PAGE_DISPLAY_COUNT=5;
+	      //한 페이지에 몇개씩 표시할 것인지
+	      final int PAGE_ROW_COUNT=8;
+	      //하단 페이지를 몇개씩 표시할 것인지
+	      final int PAGE_DISPLAY_COUNT=5;
+	      
+	      //보여줄 페이지의 번호를 일단 1이라고 초기값 지정
+	      int pageNum=1;
+	      //페이지 번호가 파라미터로 전달되는지 읽어와 본다.
+	      String strPageNum = request.getParameter("pageNum");
+	      //만일 페이지 번호가 파라미터로 넘어 온다면
+	      if(strPageNum != null){
+	         //숫자로 바꿔서 보여줄 페이지 번호로 지정한다.
+	         pageNum=Integer.parseInt(strPageNum);
+	      }
+	      
+	      //보여줄 페이지의 시작 ROWNUM
+	      int startRowNum = 1 + (pageNum-1) * PAGE_ROW_COUNT;
+	      //보여줄 페이지의 끝 ROWNUM
+	      int endRowNum = pageNum * PAGE_ROW_COUNT;
+	      
+	      //startRowNum 과 endRowNum  을 GalleryDto 객체에 담고
+	      GalleryDto dto = new GalleryDto();
+	      dto.setStartRowNum(startRowNum);
+	      dto.setEndRowNum(endRowNum);
+	      
+	      //GalleryDao 객체를 이용해서 회원 목록을 얻어온다.
+	      List<GalleryDto> list = dao.getList(dto);
+	      
+	      //하단 시작 페이지 번호 
+	      int startPageNum = 1 + ((pageNum-1)/PAGE_DISPLAY_COUNT) * PAGE_DISPLAY_COUNT;
+	      //하단 끝 페이지 번호
+	      int endPageNum = startPageNum + PAGE_DISPLAY_COUNT - 1;
+	      
+	      //전체 row 의 갯수
+	      int totalRow = dao.getCount();
+	      //전체 페이지의 갯수 구하기
+	      int totalPageCount = (int)Math.ceil(totalRow / (double)PAGE_ROW_COUNT);
+	      //끝 페이지 번호가 이미 전체 페이지 갯수보다 크게 계산되었다면 잘못된 값이다.
+	      if(endPageNum > totalPageCount){
+	         endPageNum = totalPageCount; //보정해 준다. 
+	      }
+	      
+	      //request 영역에 담아주기
+	      request.setAttribute("list", list);   //gallery list
+	      request.setAttribute("startPageNum", startPageNum);   //시작 페이지 번호
+	      request.setAttribute("endPageNum", endPageNum);   //끝 페이지 번호
+	      request.setAttribute("pageNum", pageNum);   //현재 페이지 번호
+	      request.setAttribute("totalPageCount", totalPageCount);   //모든 페이지 count
+	   
+	}
 
-		//보여줄 페이지의 번호를 일단 1이라고 초기값 지정
-		int pageNum=1;
-
-		//페이지 번호가 파라미터로 전달되는지 읽어와 본다.
-		String strPageNum=request.getParameter("pageNum");
-		//만일 페이지 번호가 파라미터로 넘어 온다면
-		if(strPageNum != null){
-			//숫자로 바꿔서 보여줄 페이지 번호로 지정한다.
-			pageNum=Integer.parseInt(strPageNum);
-		}	
-		
-		//보여줄 페이지의 시작 ROWNUM
-		int startRowNum=1+(pageNum-1)*PAGE_ROW_COUNT;
-		//보여줄 페이지의 끝 ROWNUM
-		int endRowNum=pageNum*PAGE_ROW_COUNT;
-		
-		/*
-			[ 검색 키워드에 관련된 처리 ]
-			-검색 키워드가 파라미터로 넘어올수도 있고 안넘어 올수도 있다.		
-		*/
-		String keyword=request.getParameter("keyword");
-		String condition=request.getParameter("condition");
-		//만일 키워드가 넘어오지 않는다면 
-		if(keyword==null){
-			//키워드와 검색 조건에 빈 문자열을 넣어준다. 
-			//클라이언트 웹브라우저에 출력할때 "null" 을 출력되지 않게 하기 위해서  
-			keyword="";
-			condition=""; 
-		}
-
-		//특수기호를 인코딩한 키워드를 미리 준비한다. 
-		String encodedK=URLEncoder.encode(keyword);
-			
-		//FileDto 객체에 startRowNum 과 endRowNum 을 담는다.
-		GalleryDto dto=new GalleryDto();
-		dto.setStartRowNum(startRowNum);
-		dto.setEndRowNum(endRowNum);
-	
-		//만일 검색 키워드가 넘어온다면 
-		if(!keyword.equals("")){
-			//검색 조건이 무엇이냐에 따라 분기 하기
-			if(condition.equals("caption_imagePath")){//제목 + 파일명 검색인 경우
-				dto.setCaption(keyword);
-				dto.setImagePath(keyword);
-			}else if(condition.equals("caption")){ //제목 검색인 경우
-				dto.setCaption(keyword);
-			}else if(condition.equals("writer")){ //작성자 검색인 경우
-				dto.setWriter(keyword);
-			} // 다른 검색 조건을 추가 하고 싶다면 아래에 else if() 를 계속 추가 하면 된다.
-		}
-		
-		
-		//파일 목록을 select 해 온다.(검색 키워드가 있는경우 키워드에 부합하는 전체 글) 
-		List<GalleryDto> list=dao.getList(dto);
-		
-		//전체 글의 갯수(검색 키워드가 있는경우 키워드에 부합하는 전체 글의 갯수)
-		int totalRow=dao.getCount(dto);
-		
-		//하단 시작 페이지 번호 
-		int startPageNum = 1 + ((pageNum-1)/PAGE_DISPLAY_COUNT)*PAGE_DISPLAY_COUNT;
-		//하단 끝 페이지 번호
-		int endPageNum=startPageNum+PAGE_DISPLAY_COUNT-1;
-		
-		//전체 페이지의 갯수 구하기
-		int totalPageCount=(int)Math.ceil(totalRow/(double)PAGE_ROW_COUNT);
-		//끝 페이지 번호가 이미 전체 페이지 갯수보다 크게 계산되었다면 잘못된 값이다.
-		if(endPageNum > totalPageCount){
-			endPageNum=totalPageCount; //보정해 준다. 
-		}
-		
-		//응답에 필요한 데이터를 view page 에 전달하기 위해  request scope 에 담는다
-		request.setAttribute("list", list);
-		request.setAttribute("pageNum", pageNum);
-		request.setAttribute("startPageNum", startPageNum);
-		request.setAttribute("endPageNum", endPageNum);
-		request.setAttribute("totalPageCount", totalPageCount);
-		request.setAttribute("keyword", keyword);
-		request.setAttribute("encodedK", encodedK);
-		request.setAttribute("totalRow", totalRow); 
-		request.setAttribute("condition", condition);
-		
+	@Override
+	public void saveImage(GalleryDto dto, HttpServletRequest request) {
+	      //업로드된 파일의 정보를 가지고 있는 MultipartFile 객체의 참조값을 얻어오기
+	      MultipartFile image = dto.getImage();
+	      //원본 파일명 -> 저장할 파일 이름 만들기위해서 사용됨
+	      String orgFileName = image.getOriginalFilename();
+	      //파일 크기 -> 다운로드가 없으므로, 여기서는 필요 없다.
+	      long fileSize = image.getSize();
+	      
+	      // webapp/upload 폴더 까지의 실제 경로(서버의 파일 시스템 상에서의 경로)
+	      String realPath = request.getServletContext().getRealPath("/resources/upload");
+	      //db 에 저장할 저장할 파일의 상세 경로
+	      String filePath = realPath + File.separator;
+	      //디렉토리를 만들 파일 객체 생성
+	      File upload = new File(filePath);
+	      if(!upload.exists()) {
+	         //만약 디렉토리가 존재하지X
+	         upload.mkdir();//폴더 생성
+	      }
+	      //저장할 파일의 이름을 구성한다. -> 우리가 직접 구성해줘야한다.
+	      String saveFileName = System.currentTimeMillis() + orgFileName;
+	      
+	      try {
+	         //upload 폴더에 파일을 저장한다.
+	         image.transferTo(new File(filePath + saveFileName));
+	         System.out.println();   //임시 출력
+	      }catch(Exception e) {
+	         e.printStackTrace();
+	      }
+	      
+	      //dto 에 업로드된 파일의 정보를 담는다.
+	      //-> parameer 로 넘어온 dto 에는 caption, image 가 들어 있었다.
+	      //-> 추가할 것 : writer(id), imagePath 만 추가로 담아주면 된다.
+	      //-> num, regdate : db 에 추가하면서 자동으로 들어감
+	      String id = (String)request.getSession().getAttribute("id");
+	      dto.setWriter(id);
+	      //gallery 는 사진 다운 기능이 없다. -> orgFileName, saveFileName, fileSize 저장할 필요X
+	      //imagePath 만 저장해주면 됨
+	      dto.setImagePath("/resources/upload/" + saveFileName);
+	      
+	      //GalleryDao 를 이용해서 DB 에 저장하기
+	      dao.insert(dto);
 	}
 
 	@Override
 	public void getGalleryData(HttpServletRequest request) {
-		//수정할 게시글번호
-		int num=Integer.parseInt(request.getParameter("num"));
-		//수정할 글의 정보 얻어와서 
-		GalleryDto dto=dao.getData(num);
-		//request 에 담아준다.
-		request.setAttribute("dto", dto);
-		
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void deleteGallery(int num, HttpServletRequest request) {
-		//세션에서 로그인된 아이디를 읽어와서 
-		String id=(String)request.getSession().getAttribute("id");
-		//글 작성자와 로그인된 아이디가 다르다면 
-		GalleryDto dto=dao.getData(num);
-		//예외를 발생시켜서 삭제가 안되도록 한다. 
-		if(!id.equals(dto.getWriter())) {
-			throw new NotDeleteException("남의 갤러리 지우기 없기!");
-		}
-		//글 삭제하기 
-		dao.delete(num);
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void getDetail(HttpServletRequest request) {
-		//자세히 보여줄 글번호를 읽어온다. 
-		int num=Integer.parseInt(request.getParameter("num"));
-		//조회수 올리기
-		dao.addViewCount(num);
+	public void getDetail(ModelAndView mView, int num) {
+		//dao로 해당 게시글 num에 해당하는 데이터(dto)를 가져온다.
+		GalleryDto dto= dao.getData(num);//prev,next번호까지 담긴다.
+		//ModelAndView에 가져온 dto를 담는다.
+		mView.addObject("dto", dto);
 		
-		/*
-			[ 검색 키워드에 관련된 처리 ]
-			-검색 키워드가 파라미터로 넘어올수도 있고 안넘어 올수도 있다.		
-		*/
-		String keyword=request.getParameter("keyword");
-		String condition=request.getParameter("condition");
-		//만일 키워드가 넘어오지 않는다면 
-		if(keyword==null){
-			//키워드와 검색 조건에 빈 문자열을 넣어준다. 
-			//클라이언트 웹브라우저에 출력할때 "null" 을 출력되지 않게 하기 위해서  
-			keyword="";
-			condition=""; 
-		}
-		//CafeDto 객체를 생성해서 
-		GalleryDto dto=new GalleryDto();
-		//자세히 보여줄 글번호를 넣어준다. 
-		dto.setNum(num);
-		//만일 검색 키워드가 넘어온다면 
-		if(!keyword.equals("")){
-			//검색 조건이 무엇이냐에 따라 분기 하기
-			if(condition.equals("caption_writer")){//제목 + 작성자 검색인 경우
-				//검색 키워드를 CafeDto 에 담아서 전달한다.
-				dto.setCaption(keyword);
-				dto.setWriter(keyword);			
-			}else if(condition.equals("caption")){ //제목 검색인 경우
-				dto.setCaption(keyword);	
-			}else if(condition.equals("writer")){ //작성자 검색인 경우
-				dto.setWriter(keyword);	
-			} // 다른 검색 조건을 추가 하고 싶다면 아래에 else if() 를 계속 추가 하면 된다.
-		}
 	}
 
 	@Override
 	public void updateGallery(GalleryDto dto) {
-		dao.update(dto);
+		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public Map<String, Object> saveGallery(HttpServletRequest request, MultipartFile mFile) {
-		//업로드된 파일에 대한 정보를 MultipartFile 객체를 이용해서 얻어낼수 있다.	
-		
-		//원본 파일명
-		String orgFileName=mFile.getOriginalFilename();
-		//upload 폴더에 저장할 파일명을 직접구성한다.
-		// 1234123424343xxx.jpg
-		String saveFileName=System.currentTimeMillis()+orgFileName;
-		
-		// webapp/upload 폴더까지의 실제 경로 얻어내기 
-		String realPath=request.getServletContext().getRealPath("/resources/upload");
-		// upload 폴더가 존재하지 않을경우 만들기 위한 File 객체 생성
-		File upload=new File(realPath);
-		if(!upload.exists()) {//만일 존재 하지 않으면
-			upload.mkdir(); //만들어준다.
-		}
-		try {
-			//파일을 저장할 전체 경로를 구성한다.  
-			String savePath=realPath+File.separator+saveFileName;
-			//임시폴더에 업로드된 파일을 원하는 파일을 저장할 경로에 전송한다.
-			mFile.transferTo(new File(savePath));
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		// json 문자열을 출력하기 위한 Map 객체 생성하고 정보 담기 
-		Map<String, Object> map=new HashMap<String, Object>();
-		map.put("imagePath", "/resources/upload/"+saveFileName);
-		
-		return map;
-	}
 
-	@Override
-	public void addGallery(GalleryDto dto) {
-		dao.insert(dto);
-	}
-	
 	
 }

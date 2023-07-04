@@ -8,12 +8,9 @@
 <title>/views/gallery/upload.jsp</title>
 </head>
 <body>
-	<div class="container">
-		<h3>Alert</h3>
-		<p>
-			<strong>${dto.caption }</strong> 파일이 업로드 되었습니다.
-			<a href="${pageContext.request.contextPath}/gallery/list">확인</a>
-		</p>
-	</div>
+	<script>
+		alert("사진 업로드에 성공했습니다.")
+		location.href="${pageContext.request.contextPath}/gallery/list";
+	</script>
 </body>
 </html>
