@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>/gallery/list.jsp</title>
+<title>/views/coffee/list.jsp</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 <style>
    /* card 이미지 부모요소의 높이 지정 */
@@ -49,25 +49,22 @@
 </head>
 <body>
 <div class="container">
-      <a href="${pageContext.request.contextPath}/gallery/upload_form">사진 업로드 하러 가기</a>
-      <br />
-      <a href="${pageContext.request.contextPath}/gallery/upload_form2">사진 업로드 하러 가기2</a>
-      <br />
-      <a href="${pageContext.request.contextPath}/gallery/upload_form3">사진 업로드 하러 가기3</a>
-      <h1>겔러리 목록 입니다.</h1>
+      <a href="${pageContext.request.contextPath}/coffee/upload_form">메뉴 등록</a>
+      <a href="${pageContext.request.contextPath}/"><span>메인 홈페이지</span></a>
+      <h1>Coffee Menu</h1>
       <div class="row">
       <c:forEach var="tmp" items="${list }">
          <div class="col-sm-6 col-md-4 col-lg-3">
                <div class="card mb-3">
-                  <a href="${pageContext.request.contextPath}/gallery/detail?num=${tmp.num}">
+                  <a href="${pageContext.request.contextPath}/coffee/detail?num=${tmp.num}">
                         <div class="img-wrapper">
                            <img class="card-img-top" src="${pageContext.request.contextPath }${tmp.imagePath}" />
                         </div>
                   </a>
                   <div class="card-body">
-                        <p class="card-text">${tmp.caption}</p>
-                        <p class="card-text">by <strong>${tmp.writer}</strong></p>
-                        <p><small>${tmp.regdate}</small></p>
+                        <p class="card-text">${tmp.title}</p>
+                        <p class="card-text">by <strong>${tmp.id}</strong></p>
+                        <p><small>${tmp.price}</small></p>
                   </div>
                </div>
             </div>
@@ -78,7 +75,7 @@
       <c:choose>
          <c:when test="${startPageNum ne 1 }">
             <li class="page-item">
-                     <a class="page-link" href="${pageContext.request.contextPath}/gallery/list?pageNum=${startPageNum - 1}">Prev</a>
+                     <a class="page-link" href="${pageContext.request.contextPath}/coffee/list?pageNum=${startPageNum - 1}">Prev</a>
                </li>
          </c:when>
          <c:otherwise>
@@ -91,12 +88,12 @@
          <c:choose>
             <c:when test="${i eq pageNum }">
                <li class="page-item active">
-                        <a class="page-link" href="${pageContext.request.contextPath}/gallery/list?pageNum=${i}">${i }</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/coffee/list?pageNum=${i}">${i }</a>
                      </li>
             </c:when>
             <c:otherwise>
                <li class="page-item">
-                        <a class="page-link" href="${pageContext.request.contextPath}/gallery/list?pageNum=${i}">${i}</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/coffee/list?pageNum=${i}">${i}</a>
                      </li>
             </c:otherwise>
          </c:choose>
@@ -104,7 +101,7 @@
       <c:choose>
          <c:when test="${endPageNum lt totalPageCount }">
             <li class="page-item">
-                     <a class="page-link" href="${pageContext.request.contextPath}/gallery/list?pageNum=${endPageNum + 1}">Next</a>
+                     <a class="page-link" href="${pageContext.request.contextPath}/coffee/list?pageNum=${endPageNum + 1}">Next</a>
                </li>
          </c:when>
          <c:otherwise>

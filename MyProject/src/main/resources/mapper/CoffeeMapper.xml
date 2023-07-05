@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="coffee">
+	<select id="getList" parameterType="coffeeDto" resultType="coffeeDto">
+      SELECT *
+      FROM   
+         (SELECT result1.*, ROWNUM as rnum
+         FROM
+            (SELECT num, id, title, caption, imagePath, price
+            FROM board_coffee
+            ORDER BY num DESC) result1)
+      WHERE rnum BETWEEN #{startRowNum} AND #{endRowNum}
+   </select>
+   <select id="getCount" resultType="int">
+      SELECT NVL(MAX(ROWNUM), 0)
+      FROM board_coffee
+   </select>
+   <insert id="insert" parameterType="coffeeDto">
+      INSERT INTO board_coffee
+      (num, id, title, caption, imagePath, price)
+      VALUES(board_coffee_seq.NEXTVAL, #{id},#{title}, #{caption}, #{imagePath}, #{price})
+   </insert>
+   <select id="getData" parameterType="int" resultType="coffeeDto">
+      SELECT *
+      FROM
+         (SELECT num, id, title, caption, imagePath, price, 
+            LAG(num, 1, 0) OVER (ORDER BY num DESC) AS prevNum,
+            LEAD(num, 1, 0) OVER (ORDER BY num DESC) AS nextNum
+         FROM board_coffee
+         ORDER BY num DESC)
+      WHERE num = #{num}
+   </select>
+   <update id="update" parameterType="coffeeDto">
+		UPDATE board_coffee
+		SET title=#{title}, content=#{content}, price=#{price}
+		WHERE num=#{num}
+	</update>
+</mapper>

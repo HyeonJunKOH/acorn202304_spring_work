@@ -2,6 +2,9 @@ package com.gura.spring04.gallery.controller;
 
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gura.spring04.gallery.dto.GalleryDto;
@@ -48,7 +52,25 @@ public class GalleryController {
 			
 		return "gallery/upload_form2";
 	}
+	
+	//갤러리 사진 업롣 form 페이지로 이동
+	@RequestMapping("/gallery/upload_form3")
+	public String uploadForm3() {
 		
+		return "gallery/upload_form3";
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/gallery/ajax_upload")
+	@ResponseBody
+	public Map<String, Object> ajaxUpload(GalleryDto dto, HttpServletRequest request){
+		//서비스를 이용해서 업로드된 이미지를 저장하고
+		service.saveImage(dto, request);
+		//{"isSuccess":true}형식의 json 문자열 응답
+		Map<String, Object>map=new HashMap<String, Object>();
+		map.put("isSuccess", true);
+		return map;
+	}
+	
 	//갤러리 사진 업로드&DB 저장
 	@RequestMapping(method = RequestMethod.POST, value = "/gallery/upload")
 	public String upload(GalleryDto dto, HttpServletRequest request) {
