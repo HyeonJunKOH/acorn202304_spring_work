@@ -21,7 +21,7 @@ public class CoffeeDaoImpl implements CoffeeDao {
 	@Override
 	public CoffeeDto getData(int num) {
 		
-		return session.selectOne("coffee.getData", num);
+		return session.selectOne("coffee.getData",num);
 	}
 
 	@Override

@@ -42,6 +42,10 @@
 	         	<label for="caption">메뉴 설명</label>
 	         	<input type="text" name="caption" id="caption"/>
 	      	</div>
+	      	<div>
+	         	<label for="price">가격</label>
+	         	<input type="text" name="price" id="price"/>
+	      	</div>
 	      	
 	        <input type="file" name="image" id="image"
 	            	accept=".jpg, .jpeg, .png, .JPG, .JPEG"/>
@@ -54,12 +58,15 @@
 		   	</div>
 	   	</a>
 	   	<button id="submitBtn">메뉴등록</button>
+	   	<button><a href="${pageContext.request.contextPath}/coffee/list">메뉴로 가기</a></button>
 	</div>
 	<script>
 		//업로드 버튼을 눌렀을 때
 		document.querySelector("#submitBtn").addEventListener("click", ()=>{
-			//입력한 caption을 읽어온다.
+			//입력한 caption, title, price을 읽어온다.
 			const caption=document.querySelector("#caption").value;
+			const title=document.querySelector("#title").value;
+			const price=document.querySelector("#price").value;
 			const files=document.querySelector("#image").files;
 			//만일 caption 을 3글자 미만으로 입력하거나 선택한 파일이 없다면
 			if(caption.length <3 || files.length == 0){
@@ -68,8 +75,10 @@
 			}
 			//ajax 전송할 데이터를 FormData() 객체에 담는다.
 			const data=new FormData();
-			//caption 이라는 파라미터 명으로 input 요소에 입력한 문자열을 담는다.
+			//caption,title,price 이라는 파라미터 명으로 input 요소에 입력한 문자열을 담는다.
+			data.append("title",title);
 			data.append("caption",caption);
+			data.append("price",price);
 			//input요소에 선택된 파일 데이터 얻어오기
 			const file=files[0];
 			//image 라는 파라미터 명으로 현재 선택한 파일을 객체에 담는다.
@@ -93,6 +102,8 @@
 					// input type="file"을 reset 하는 방법
 					document.querySelector("#image").value="";
 					document.querySelector("#caption").value="";
+					document.querySelector("#title").value="";
+					document.querySelector("#price").value="";
 				}
 			});
 		});

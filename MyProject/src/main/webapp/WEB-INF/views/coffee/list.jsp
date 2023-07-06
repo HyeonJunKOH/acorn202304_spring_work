@@ -63,8 +63,10 @@
                   </a>
                   <div class="card-body">
                         <p class="card-text">${tmp.title}</p>
-                        <p class="card-text">by <strong>${tmp.id}</strong></p>
+                        <p class="card-text"><strong>${tmp.caption}</strong></p>
                         <p><small>${tmp.price}</small></p>
+                        <button><a href="">담기</a></button>
+                        <button><a href="${pageContext.request.contextPath}/coffee/order">주문하기</a></button>
                   </div>
                </div>
             </div>

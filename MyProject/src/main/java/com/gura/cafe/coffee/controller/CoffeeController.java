@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.gura.cafe.coffee.dto.CoffeeDto;
 import com.gura.cafe.coffee.service.CoffeeService;
@@ -42,5 +44,24 @@ public class CoffeeController {
 		map.put("isSuccess", true);
 		return map;
 	}
-	
+	//detail요청처리
+	@RequestMapping(method = RequestMethod.GET, value = "/coffee/detail")
+	public ModelAndView detail(ModelAndView mView, int num) {
+		//coffee detail 페이지에 필요한 data를 num으로 가져와서 ModelAndView에 저장
+		service.getDetail(mView, num);
+		mView.setViewName("coffee/detail");
+		return mView;
+	}
+	//메뉴 수정 폼 요청 처리 
+	@RequestMapping("/coffee/update_form")
+	public String updateForm(HttpServletRequest request) {
+		service.getData(request);
+		return "coffee/update_form";
+	}
+	//메뉴 수정 요청처리
+	@RequestMapping("/coffee/update")
+	public String update(CoffeeDto dto) {
+		service.updateCoffee(dto);
+		return "coffee/update";
+	}
 }

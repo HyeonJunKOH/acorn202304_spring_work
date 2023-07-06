@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -114,21 +115,28 @@ public class CoffeeServiceImpl implements CoffeeService{
 	}
 
 	@Override
-	public void getCoffeeData(HttpServletRequest request) {
-		// TODO Auto-generated method stub
+	public void getData(HttpServletRequest request) {
+		//수정할 메뉴 번호
+		int num=Integer.parseInt(request.getParameter("num"));
+		//수정할 메뉴의 정보를 얻어와서
+		CoffeeDto dto=dao.getData(num);
+		//request에 담아준다.
+		request.setAttribute("dto", dto);
 		
 	}
 
 	@Override
 	public void getDetail(ModelAndView mView, int num) {
-		// TODO Auto-generated method stub
-		
+		//dao로 해당 게시글 num에 해당하는 데이터(dto)를 가져온다.
+		CoffeeDto dto=dao.getData(num);//prev, next 번호까지 담긴다.
+		//ModelAndView에 가져온 dto를 담는다.
+		mView.addObject("dto", dto);
 	}
 
 	@Override
 	public void updateCoffee(CoffeeDto dto) {
-		// TODO Auto-generated method stub
 		
+		dao.update(dto);
 	}
 
 }

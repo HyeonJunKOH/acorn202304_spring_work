@@ -19,7 +19,7 @@
    <insert id="insert" parameterType="coffeeDto">
       INSERT INTO board_coffee
       (num, id, title, caption, imagePath, price)
-      VALUES(board_coffee_seq.NEXTVAL, #{id},#{title}, #{caption}, #{imagePath}, #{price})
+      VALUES(board_coffee_seq.NEXTVAL, #{id}, #{title}, #{caption}, #{imagePath}, #{price})
    </insert>
    <select id="getData" parameterType="int" resultType="coffeeDto">
       SELECT *
@@ -33,7 +33,7 @@
    </select>
    <update id="update" parameterType="coffeeDto">
 		UPDATE board_coffee
-		SET title=#{title}, content=#{content}, price=#{price}
+		SET title=#{title}, caption=#{caption}, price=#{price}
 		WHERE num=#{num}
 	</update>
 </mapper>
