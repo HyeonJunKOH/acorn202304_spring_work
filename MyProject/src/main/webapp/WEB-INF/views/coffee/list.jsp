@@ -51,6 +51,7 @@
 <div class="container">
       <a href="${pageContext.request.contextPath}/coffee/upload_form">메뉴 등록</a>
       <a href="${pageContext.request.contextPath}/"><span>메인 홈페이지</span></a>
+      <a href="${pageContext.request.contextPath}/coffee/order_list" id="count"><span>장바구니</span></a>
       <h1>Coffee Menu</h1>
       <div class="row">
       <c:forEach var="tmp" items="${list }">
@@ -62,16 +63,41 @@
                         </div>
                   </a>
                   <div class="card-body">
-                        <p class="card-text">${tmp.title}</p>
-                        <p class="card-text"><strong>${tmp.caption}</strong></p>
-                        <p><small>${tmp.price}</small></p>
-                        <button><a href="">담기</a></button>
-                        <button><a href="${pageContext.request.contextPath}/coffee/order">주문하기</a></button>
+                        <p class="card-text">메뉴 : <strong>${tmp.title}</strong></p>
+                        <p class="card-text">메뉴설명: <strong>${tmp.caption}</strong></p>
+                        <p>가격: <strong>${tmp.price}</strong></p>
+                        <button data-num="${tmp.num }" data-title="${tmp.title }"data-price="${tmp.price }" class="addBtn">담기</button>
+      	 				<button onclick="location.href=${pageContext.request.contextPath}/coffee/order_list">주문하기</button>
                   </div>
                </div>
             </div>
       </c:forEach>
       </div>
+      <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
+      <script>
+      
+	   		//만일 한번도 cart 에 담은적이 없다면 
+	    	if(localStorage.cartList == undefined){
+	    		//빈 배열 형태의 JSON 문자열을  cartList 라는 키값으로 저장한다. 
+	    		localStorage.cartList="[]";
+	    	}
+	    	//JSON 문자열을  실제 배열로 변환
+	    	const cartList=JSON.parse(localStorage.cartList);
+	    	
+	    	$(".addBtn").click(function(e){
+	    		/*
+	    		const num=e.target.getAttribute("data-num");
+	    		const price=e.target.getAttribute("data-price");
+	    		*/
+	    		const num=$(e.target).attr("data-num");
+	    		const title=$(e.target).attr("data-title");
+	    		const price=$(e.target).attr("data-price");
+	    		cartList.push({num, title, price});
+	    		//localStorage 에 반영, cartList를 json 문자열로 변경해주기
+	    		localStorage.cartList=JSON.stringify(cartList);
+	  
+	    	});
+      </script>
       <nav>
    <ul class="pagination justify-content-center">
       <c:choose>

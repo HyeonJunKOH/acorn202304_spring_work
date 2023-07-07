@@ -64,4 +64,10 @@ public class CoffeeController {
 		service.updateCoffee(dto);
 		return "coffee/update";
 	}
+	//주문보기 폼 요청 처리
+	@RequestMapping("/coffee/order_list")
+	public String list() {
+		
+		return "coffee/order_list";
+	}
 }

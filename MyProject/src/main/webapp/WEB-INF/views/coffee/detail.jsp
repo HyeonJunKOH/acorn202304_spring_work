@@ -27,9 +27,9 @@
    <div class="card mb-3">
       <img class="card-img-top" src="${pageContext.request.contextPath}${dto.imagePath}"/>
       <div class="card-body">
-         <p class="card-text">${dto.title}</p>
-         <p class="card-text"><strong>${dto.caption}</strong></p>
-         <p><small>${dto.price}</small></p>
+         <p class="card-text">메뉴 이름: <strong>${dto.title}</strong></p>
+         <p class="card-text">메뉴 설명: <strong>${dto.caption}</strong></p>
+         <p><small>가격: <strong>${dto.price}</strong></small></p>
       </div>
    </div>
    <nav>
