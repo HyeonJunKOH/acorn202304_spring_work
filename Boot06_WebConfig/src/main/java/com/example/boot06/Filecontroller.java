@@ -49,7 +49,7 @@ public class Filecontroller {
       //InputStreamResource 객체의 참조값 얻어내기
       InputStreamResource isr=new InputStreamResource(is);
       
-      //ResponseEntity 객체의 참조값 얻어내기 
+      //ResponseEntity 객체의 참조값 얻어내기 Spring에서 파일을 다운로드 해줄 수 있게 만들어준다.
       ResponseEntity<InputStreamResource> resEn=ResponseEntity.ok()
          .headers(headers)
          .header("Content-Transfer-Encoding", "binary")

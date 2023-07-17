@@ -1,8 +1,9 @@
-package com.example.boot06;
+package com.example.boot07.file.dto;
 
+import org.apache.ibatis.type.Alias;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Alias("fileDto")
 public class FileDto {
 	private int num;
 	private String writer;
