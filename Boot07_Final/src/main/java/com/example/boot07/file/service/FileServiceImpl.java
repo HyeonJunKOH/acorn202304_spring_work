@@ -145,7 +145,6 @@ public class FileServiceImpl implements FileService{
 		if(!upload.exists()) {//만일 디렉토리가 존재하지 않으면 
 			upload.mkdir(); //만들어 준다.
 		}
-		
 		try {
 			//upload 폴더에 파일을 저장한다.
 			myFile.transferTo(new File(filePath));
